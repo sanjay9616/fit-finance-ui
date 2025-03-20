@@ -1,6 +1,25 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function Home() {
+
+  useEffect(() => {
+    callAPI();
+  }, []);
+
+  const callAPI = async () => {
+    try {
+      const url = process.env.NEXT_PUBLIC_BASE_URL || "";
+      const res = await fetch(url);
+      const responce = await res.json();
+      console.log("responce", responce);
+    } catch (error: any) {
+
+    }
+  }
+
+  console.log("NODE_ENV:", process.env.NODE_ENV);
+  console.log("NEXT_PUBLIC_BASE_URL:", process.env.NEXT_PUBLIC_BASE_URL);
+
   const [formData, setFormData] = useState({ name: '', email: '', password: '' });
   const [message, setMessage] = useState('');
 
