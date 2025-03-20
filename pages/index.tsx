@@ -32,7 +32,7 @@ export default function Home() {
     e.preventDefault();
 
     try {
-      const response = await fetch('https://fit-finance.onrender.com/users/create', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/users/create`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
