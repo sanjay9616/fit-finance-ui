@@ -1,18 +1,8 @@
-import Image from "next/image";
-import { Geist, Geist_Mono } from "next/font/google";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
 export default function Home() {
   return (
-    <div>Hello Fit Finance Front End!</div>
+    <div>
+      <h2 className="text-2xl font-semibold">Welcome to My Next.js App</h2>
+      <p className="mt-4">This is a simple app using a reusable layout with Header and Footer.</p>
+    </div>
   );
 }
