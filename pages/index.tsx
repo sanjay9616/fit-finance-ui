@@ -1,52 +1,39 @@
+import { userService } from '@/services/userService';
 import { useEffect, useState } from 'react';
 
 export default function Home() {
 
+  const [formData, setFormData] = useState({ name: '', email: '', password: '' });
+  const [message, setMessage] = useState('');
+
   useEffect(() => {
-    callAPI();
+    getDummyData();
   }, []);
 
-  const callAPI = async () => {
+  const getDummyData = async () => {
     try {
-      const url = process.env.NEXT_PUBLIC_BASE_URL || "";
-      const res = await fetch(url);
-      const responce = await res.json();
-      console.log("responce", responce);
+      const dummyData: any = await userService.dummyAPI();
+      console.log("dummyData", dummyData);
     } catch (error: any) {
 
     }
   }
-
-  console.log("NODE_ENV:", process.env.NODE_ENV);
-  console.log("NEXT_PUBLIC_BASE_URL:", process.env.NEXT_PUBLIC_BASE_URL);
-
-  const [formData, setFormData] = useState({ name: '', email: '', password: '' });
-  const [message, setMessage] = useState('');
 
   const handleChange = (e: any) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSubmit = async (e: any) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/users/create`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to create user');
-      }
-
-      const data = await response.json();
+      const data: any = await userService.createUser(formData);
+      console.log("data", data);
       setMessage(`User created successfully: ${data.name}`);
       setFormData({ name: '', email: '', password: '' });
     } catch (error: any) {
-      setMessage(error.message);
+      setMessage(error?.response?.data?.message || 'Failed to create user');
     }
   };
 
