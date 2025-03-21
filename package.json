@@ -9,7 +9,9 @@
     "build": "ENVIRONMENT=dev next build",
     "build:qa": "ENVIRONMENT=qa next build",
     "build:prod": "ENVIRONMENT=prod next build",
-    "start": "next start",
+    "start": "ENVIRONMENT=dev next start",
+    "start:qa": "ENVIRONMENT=qa next start",
+    "start:prod": "ENVIRONMENT=prod next start",
     "lint": "next lint"
   },
   "dependencies": {
