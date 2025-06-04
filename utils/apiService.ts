@@ -5,8 +5,8 @@ const apiClient = axios.create({
     timeout: 10000,
 });
 
-function handleSuccess<T>(response: AxiosResponse<T>): AxiosResponse<T> {
-    return response;
+function handleSuccess<T>(response: AxiosResponse<T>): T {
+    return response.data;
 }
 
 function handleError(error: any): never {
@@ -14,23 +14,23 @@ function handleError(error: any): never {
 }
 
 export const apiService = {
-    get: <T = any>(url: string, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> => {
+    get: <T = any>(url: string, config?: AxiosRequestConfig): Promise<T> => {
         return apiClient.get<T>(url, config).then(handleSuccess).catch(handleError);
     },
 
-    post: <T = any>(url: string, data: any, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> => {
+    post: <T = any>(url: string, data: any, config?: AxiosRequestConfig): Promise<T> => {
         return apiClient.post<T>(url, data, config).then(handleSuccess).catch(handleError);
     },
 
-    put: <T = any>(url: string, data: any, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> => {
+    put: <T = any>(url: string, data: any, config?: AxiosRequestConfig): Promise<T> => {
         return apiClient.put<T>(url, data, config).then(handleSuccess).catch(handleError);
     },
 
-    delete: <T = any>(url: string, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> => {
+    delete: <T = any>(url: string, config?: AxiosRequestConfig): Promise<T> => {
         return apiClient.delete<T>(url, config).then(handleSuccess).catch(handleError);
     },
 
-    patch: <T = any>(url: string, data: any, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> => {
+    patch: <T = any>(url: string, data: any, config?: AxiosRequestConfig): Promise<T> => {
         return apiClient.patch<T>(url, data, config).then(handleSuccess).catch(handleError);
     },
 };
