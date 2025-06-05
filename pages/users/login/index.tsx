@@ -1,12 +1,9 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/router';
-import { userService } from '@/services/userService';
-import toast from 'react-hot-toast';
 
 const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [message, setMessage] = useState('');
     const router = useRouter();
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -23,7 +20,6 @@ const Login = () => {
             <div className="p-8 bg-white shadow-xl rounded-xl transition-transform transform hover:scale-105">
                 <h2 className="text-3xl font-bold mb-2 text-blue-600">Welcome Back!</h2>
                 <p className="text-gray-600 mb-4">Login to your account and start managing your finances with ease.</p>
-                {message && <p className="text-red-500 mb-4">{message}</p>}
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <input
                         className="border p-3 w-full rounded-lg focus:ring-2 focus:ring-blue-400 transition"
@@ -43,7 +39,7 @@ const Login = () => {
                     />
                     <button type="submit" className="w-full bg-gradient-to-r from-blue-500 to-blue-700 text-white py-3 px-6 rounded-lg shadow-md hover:shadow-lg hover:scale-105 transition-transform duration-300 cursor-pointer">Login</button>
                 </form>
-                <p className="text-gray-600 mt-4">Don't have an account? <button onClick={handleSignUp} className="text-blue-600 hover:underline cursor-pointer">Sign up here</button>.</p>
+                <p className="text-gray-600 mt-4">{`Don't have an account?`}<button onClick={handleSignUp} className="text-blue-600 hover:underline cursor-pointer">Sign up here</button>.</p>
             </div>
 
             {/* Right Side: Content Section */}

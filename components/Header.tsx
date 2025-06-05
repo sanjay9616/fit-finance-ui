@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Menu, X } from 'lucide-react';
-import router from 'next/router';
 import { useRouter } from 'next/router';
 
 const Header = () => {

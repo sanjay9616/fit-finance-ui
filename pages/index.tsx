@@ -54,7 +54,7 @@ export default function Home() {
             { quote: "The diet and workout management features are incredible. Staying fit and organized has never been so simple.", name: "Priya Sharma" }
           ].map((testimonial, index) => (
             <div key={index} className="text-center p-6 bg-white rounded-lg shadow-md hover:shadow-xl transition border-t-4 border-blue-500">
-              <p className="italic text-gray-700">"{testimonial.quote}"</p>
+              <p className="italic text-gray-700">{testimonial.quote}</p>
               <p className="mt-4 font-semibold text-blue-600">- {testimonial.name}</p>
             </div>
           ))}
