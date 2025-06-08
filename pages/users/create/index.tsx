@@ -6,7 +6,6 @@ import toast from 'react-hot-toast';
 const Index = () => {
 
     const [formData, setFormData] = useState({ name: '', email: '', password: '' });
-    const [message, setMessage] = useState('');
 
     const handleChange = (e: any) => {
         const { name, value } = e.target;
@@ -19,13 +18,9 @@ const Index = () => {
         try {
             const data: any = await userService.createUser(formData);
             toast.success(data?.message);
-            console.log("data", data);
-            setMessage(`User created successfully: ${data.name}`);
             setFormData({ name: '', email: '', password: '' });
         } catch (error: any) {
-            console.log("error", error);
             toast.error(error?.response?.data?.message);
-            setMessage(error?.response?.data?.message || 'Failed to create user');
         }
     };
 
@@ -68,8 +63,6 @@ const Index = () => {
                     />
                     <button className="bg-gradient-to-r from-blue-500 to-blue-700 text-white py-3 px-6 rounded-lg shadow-md hover:shadow-lg hover:scale-105 transition-transform duration-300 cursor-pointer" type="submit">Create User</button>
                 </form>
-
-                {message && <p className="mt-4 text-red-500">{message}</p>}
             </div>
 
             {/* Right Side: Content Section */}

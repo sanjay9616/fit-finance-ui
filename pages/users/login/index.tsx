@@ -1,13 +1,31 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/router';
+import { userService } from '@/services/userService';
+import toast from 'react-hot-toast';
 
 const Login = () => {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+    const [formData, setFormData] = useState({ email: '', password: '' });
     const router = useRouter();
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        if (!name) return; // Ignore inputs without name
+        setFormData({ ...formData, [name]: value });
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        try {
+            const data: any = await userService.loginUser(formData);
+            toast.success(data?.message);
+            setFormData({ email: '', password: '' });
+            if (data?.status === 200 && data?.success) {
+                router.push('/');
+            }
+        } catch (error: any) {
+            toast.error(error?.response?.data?.message);
+        }
     };
 
     const handleSignUp = () => {
@@ -24,20 +42,26 @@ const Login = () => {
                     <input
                         className="border p-3 w-full rounded-lg focus:ring-2 focus:ring-blue-400 transition"
                         type="email"
+                        name="email"
                         placeholder="Email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
+                        value={formData.email}
+                        onChange={handleChange}
                         required
                     />
                     <input
                         className="border p-3 w-full rounded-lg focus:ring-2 focus:ring-blue-400 transition"
                         type="password"
+                        name="password"
                         placeholder="Password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
+                        value={formData.password}
+                        onChange={handleChange}
                         required
                     />
-                    <button type="submit" className="w-full bg-gradient-to-r from-blue-500 to-blue-700 text-white py-3 px-6 rounded-lg shadow-md hover:shadow-lg hover:scale-105 transition-transform duration-300 cursor-pointer">Login</button>
+                    <button
+                        type="submit"
+                        className="w-full bg-gradient-to-r from-blue-500 to-blue-700 text-white py-3 px-6 rounded-lg shadow-md hover:shadow-lg hover:scale-105 transition-transform duration-300 cursor-pointer">
+                        Login
+                    </button>
                 </form>
                 <p className="text-gray-600 mt-4">{`Don't have an account?`}<button onClick={handleSignUp} className="text-blue-600 hover:underline cursor-pointer">Sign up here</button>.</p>
             </div>

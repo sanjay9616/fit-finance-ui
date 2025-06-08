@@ -12,7 +12,7 @@ interface Expense {
 
 const Index = () => {
     const [expenses, setExpenses] = useState<Expense[]>([
-        { id: 1, name: 'Salary', email: 'salary@example.com', amount: 61000, date: '2025-03-01' },
+        { id: 1, name: 'Salary', email: 'salary@example.com', amount: 105000, date: '2025-03-01' },
         { id: 2, name: 'Ashish', email: 'ashish@example.com', amount: -13036, date: '2025-03-05' },
         { id: 3, name: 'In Pocket', email: 'pocket@example.com', amount: -18000, date: '2025-03-10' },
         { id: 4, name: 'Saving', email: 'saving@example.com', amount: -16500, date: '2025-03-12' },
