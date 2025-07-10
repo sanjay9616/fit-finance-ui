@@ -40,8 +40,8 @@ const Header = () => {
                     <Image
                         src="/logo.png"
                         alt="Logo"
-                        width={120}
-                        height={40}
+                        width={55}
+                        height={55}
                         className="object-contain"
                         priority
                     />

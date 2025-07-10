@@ -4,7 +4,7 @@ import { FormField } from '@/config/interfaces';
 import { userService } from '@/services/userService';
 import { AppDispatch } from '@/store';
 import { loginSuccess, logout } from '@/store/slices/authSlice';
-import router from 'next/router';
+import { useRouter } from 'next/router';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useDispatch } from 'react-redux';
@@ -17,6 +17,7 @@ const LoginForm = ({ onLoginSuccess }: LoginFormProps) => {
     const [formData, setFormData] = useState<{ [key: string]: string }>({});
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
     const dispatch = useDispatch<AppDispatch>();
+    const router = useRouter();
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;

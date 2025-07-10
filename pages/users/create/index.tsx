@@ -1,10 +1,13 @@
+import { useRouter } from 'next/router';
 import React from 'react';
-import Router from 'next/router';
 import UserCreateForm from './UserCreateForm';
 
 const Index = () => {
+
+    const router = useRouter();
+
     const handleLogin = () => {
-        Router.push('/users/login');
+        router.push('/users/login');
     };
 
     return (
