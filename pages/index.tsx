@@ -32,7 +32,7 @@ export default function Home() {
         <LoginForm onLoginSuccess={() => setShowLogin(false)} />
       </Modal>
       {/* Hero Section */}
-      <section className="text-center py-12 md:py-20 px-4 bg-gradient-to-r from-blue-400 to-indigo-500 text-white rounded-xl shadow-md mx-2 md:mx-auto max-w-5xl">
+      <section className="text-center py-12 md:py-20 px-4 bg-gradient-to-r from-blue-400 to-indigo-500 text-white rounded-xl shadow-md mx-0 md:mx-auto max-w-5xl">
         <h2 className="text-2xl md:text-4xl font-bold leading-snug">
           Empower Your Financial & Fitness Journey
         </h2>
@@ -45,7 +45,7 @@ export default function Home() {
       </section>
 
       {/* Features Section */}
-      <section id="features" className="py-12 px-4">
+      <section id="features" className="py-12 px-0">
 
         <h2 className="text-2xl sm:text-3xl font-bold text-center text-blue-700">Why Choose Fit Finance?</h2>
 
@@ -53,7 +53,7 @@ export default function Home() {
           {features.map((feature, index) => (
             <div
               key={index}
-              className="group relative p-5 sm:p-6 bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border-t-4 border-blue-500 cursor-pointer"
+              className="group relative px-5 py-5 sm:p-6 bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border-t-4 border-blue-500 cursor-pointer"
               onClick={() => handleFeatureClick(feature.path)}
             >
               <h3 className="text-lg sm:text-xl font-semibold text-blue-600">{feature.title}</h3>
@@ -79,7 +79,7 @@ export default function Home() {
         `}
       </style>
 
-      <section id="testimonials" className="py-16 bg-blue-50 px-4">
+      <section id="testimonials" className="py-16 bg-blue-50 px-0">
         <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-center text-blue-700 leading-snug px-4">
           What Our Users Say
         </h2>
@@ -114,7 +114,7 @@ export default function Home() {
       </section>
 
       {/* Feedback Section */}
-      <section id="feedback" className="py-16 px-4">
+      <section id="feedback" className="py-16 px-0">
         <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-center text-blue-700 leading-snug px-4">
           We Value Your Feedback
         </h2>

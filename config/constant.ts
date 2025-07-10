@@ -3,7 +3,7 @@ import { FormField } from "./interfaces";
 export const features = [
     { title: "Track Your Daily Expenses", desc: "Easily categorize and monitor your expenses in real time.", path: "/expense-tracking" },
     { title: "Set Monthly Expense Goals", desc: "Set goals, track progress, and achieve with Fit Finance." },
-    { title: "Split & Settle Your Expenses", desc: "Easily divide expenses among friends or family members." },
+    { title: "Split/Settle Your Expenses", desc: "Easily divide expenses among friends or family members." },
     { title: "Budget & Savings Report", desc: "Generate detailed reports to analyze your spending and savings." },
     { title: "Set Your Daily Macros & Meals", desc: "Track your daily nutrition intake, manage meals, and stay fit.", path: "/diet-management" },
     { title: "Set Your Workout Plans", desc: "Create and customize your own workout routines and monitor your fitness journey." },

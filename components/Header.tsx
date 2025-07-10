@@ -38,11 +38,11 @@ const Header = () => {
             <div className="flex items-center justify-between px-4 py-3 md:px-8">
                 <div onClick={() => router.push('/')} className="flex items-center cursor-pointer">
                     <Image
-                        src="/logo.png"
+                        src="/logo-3.png"
                         alt="Logo"
-                        width={55}
-                        height={55}
-                        className="object-contain"
+                        width={35}
+                        height={35}
+                        className="object-contain rounded-full"
                         priority
                     />
                 </div>
