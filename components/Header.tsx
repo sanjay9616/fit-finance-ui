@@ -7,6 +7,7 @@ import { features } from '@/config/constant';
 import toast from 'react-hot-toast';
 import { logout } from '@/store/slices/authSlice';
 import Image from 'next/image';
+import { Features } from '@/config/interfaces';
 
 const Header = () => {
     const user = useSelector((state: RootState) => state.auth.user);
@@ -92,14 +93,25 @@ const Header = () => {
 
             {/* Mobile View */}
             <div className="md:hidden">
-                <div className={`fixed top-0 left-0 h-full w-full max-w-xs bg-white z-50 shadow-xl transform transition-transform duration-300 ease-in-out ${menuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-                    <div className="flex items-center justify-between px-4 py-4 border-b">
-                        <div className="flex items-center gap-2">
+                <div className={`fixed top-0 left-0 h-full w-full max-w-xs bg-white z-50 shadow-xl transform-gpu transition-transform duration-300 ease-in-out ${menuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+                    <div className="flex items-center justify-between px-5 py-4 bg-gradient-to-r from-blue-50 to-blue-100 border-b">
+                        <div className="flex items-center gap-3">
                             <div className="w-10 h-10 bg-blue-100 flex items-center justify-center rounded-full">
-                                <User className="text-blue-600" size={20} />
+                                {user?.id ? (
+                                    <span className="text-white bg-blue-600 w-full h-full flex items-center justify-center rounded-full font-semibold text-sm uppercase">
+                                        {user?.name
+                                            ?.split(' ')
+                                            .map((n: string) => n[0])
+                                            .slice(0, 2)
+                                            .join('')}
+                                    </span>
+                                ) : (
+                                    <User className="text-blue-600" size={20} />
+                                )}
                             </div>
+
                             {user?.id ? (
-                                <span className="text-blue-600 font-semibold text-base">{user.name}</span>
+                                <span className="text-blue-700 font-semibold text-base">{user.name}</span>
                             ) : (
                                 <button
                                     onClick={() => {
@@ -121,9 +133,8 @@ const Header = () => {
                             <X size={20} />
                         </button>
                     </div>
-
                     <div className="flex flex-col gap-3 px-6 py-6 text-base font-medium">
-                        {features.map((item) => (
+                        {features.map((item: Features) => (
                             <button
                                 key={item.title}
                                 onClick={() => handleRedirection(item.path)}
@@ -134,20 +145,22 @@ const Header = () => {
                             </button>
                         ))}
 
+                        <hr className="border-t border-gray-200 my-4" />
+
                         {user?.id ? (
                             <button
                                 onClick={handleLogout}
-                                className="mt-4 bg-blue-600 text-white py-2 rounded-full hover:bg-blue-700 transition"
+                                className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-2.5 rounded-full font-semibold shadow hover:scale-105 transition-transform"
                             >
                                 Logout
                             </button>
                         ) : (
                             <button
                                 onClick={() => {
-                                    setMenuOpen(false)
-                                    router.push('/users/create')
+                                    setMenuOpen(false);
+                                    router.push('/users/create');
                                 }}
-                                className="mt-4 bg-blue-600 text-white py-2 rounded-full hover:bg-blue-700 transition"
+                                className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-2.5 rounded-full font-semibold shadow hover:scale-105 transition-transform"
                             >
                                 Sign Up
                             </button>
@@ -155,6 +168,7 @@ const Header = () => {
                     </div>
                 </div>
             </div>
+
 
 
             {/* Overlay when mobile menu is open */}

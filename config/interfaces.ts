@@ -1,3 +1,9 @@
+export interface Features {
+    title: string,
+    desc: string,
+    path: string,
+}
+
 export interface Expense {
     _id?: string
     category: string;
@@ -17,9 +23,9 @@ export interface ExpenseFormData {
 export interface FormField {
     name: string;
     type: string;
-    label?: string;
-    placeholder?: string;
-    required?: boolean;
+    label: string;
+    placeholder: string;
+    required: boolean;
     validation?: {
         pattern?: RegExp;
         minLength?: number;

@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router';
 import React from 'react';
-import UserCreateForm from './UserCreateForm';
+import SignupForm from './signup-form';
 
 const Index = () => {
 
@@ -13,7 +13,7 @@ const Index = () => {
     return (
         <div className="p-0 md:p-8 grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
             {/* Left Form Section */}
-            <UserCreateForm />
+            <SignupForm />
 
             {/* Right Info Section */}
             <div className="hidden md:block bg-gradient-to-r from-green-100 to-green-200 p-8 rounded-xl shadow-xl transition-transform transform hover:scale-105">

@@ -10,11 +10,11 @@ import { useSelector } from 'react-redux';
 import ExpenseModal from './ExpenseModal';
 
 const Index = () => {
-    const range: string[] = ["Today", "This Week", "Last Week", "This Month", "Last Month", "This Year", "Last Year"];
+    const range: string[] = ["Today", "This Week", "Last Week", "This Month", "Last Month", "This Year", "Last Year", "All Time"];
     const [expenses, setExpenses] = useState<Expense[]>([]);
     const [editingIndex, setEditingIndex] = useState<number | null>(null);
     const [editedExpense, setEditedExpense] = useState<Expense | null>(null);
-    const [selectedRange, setSelectedRange] = useState('Today');
+    const [selectedRange, setSelectedRange] = useState('This Month');
     const [showModal, setShowModal] = useState(false);
     const { reset } = useForm<ExpenseFormData>({ mode: 'onTouched' });
     const user = useSelector((state: RootState) => state.auth.user);
@@ -153,6 +153,10 @@ const Index = () => {
             case 'Last Year':
                 from = new Date(today.getFullYear() - 1, 0, 1);
                 to = new Date(today.getFullYear() - 1, 11, 31);
+                break;
+            case 'All Time':
+                from = new Date(2000, 0, 1);
+                to = new Date();
                 break;
             default:
                 break;

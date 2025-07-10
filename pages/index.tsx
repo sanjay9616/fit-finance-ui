@@ -7,6 +7,7 @@ import LoginForm from './users/login/login-form';
 import toast from 'react-hot-toast';
 import { features, userStatement } from '../config/constant';
 import { ChevronRight } from 'lucide-react';
+import { Features } from '@/config/interfaces';
 
 export default function Home() {
 
@@ -45,26 +46,26 @@ export default function Home() {
       </section>
 
       {/* Features Section */}
-      <section id="features" className="py-12 px-0">
-
-        <h2 className="text-2xl sm:text-3xl font-bold text-center text-blue-700">Why Choose Fit Finance?</h2>
-
-        <div className="grid lg:grid-cols-3 md:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-6 mt-10">
-          {features.map((feature, index) => (
+      <section id="features" className="py-12 px-4 sm:px-0 bg-blue-50 sm:bg-transparent">
+        <p className="text-sm text-blue-500 font-medium uppercase text-center tracking-wide mb-2">Features</p>
+        <h2 className="text-2xl sm:text-3xl font-bold text-center text-blue-700 mb-6">Why Choose Fit Finance?</h2>
+        <div className="grid sm:grid-cols-2 md:grid-cols-3 grid-cols-1 gap-6 mt-6">
+          {features.map((feature: Features, index: number) => (
             <div
               key={index}
-              className="group relative px-5 py-5 sm:p-6 bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border-t-4 border-blue-500 cursor-pointer"
+              className="group w-full p-4 bg-white rounded-xl shadow-md hover:shadow-xl transition-transform hover:scale-105 duration-300 border-l-4 border-blue-500 cursor-pointer"
               onClick={() => handleFeatureClick(feature.path)}
             >
-              <h3 className="text-lg sm:text-xl font-semibold text-blue-600">{feature.title}</h3>
-              <p className="mt-1 text-gray-600 hidden sm:block text-sm">{feature.desc}</p>
-              <div className="absolute top-1/2 right-4 transform -translate-y-1/2 block sm:hidden">
-                <ChevronRight size={20} className="text-blue-600" />
-              </div>
+              <h3 className="text-lg sm:text-xl font-semibold text-blue-600 mb-2 flex items-center gap-2">
+                {/* <span>📊</span> */}
+                {feature.title}
+              </h3>
+              <p className="text-gray-600 text-sm">{feature.desc}</p>
             </div>
           ))}
         </div>
       </section>
+
 
       {/* Testimonials Section */}
       <style jsx>{`
@@ -79,7 +80,7 @@ export default function Home() {
         `}
       </style>
 
-      <section id="testimonials" className="py-16 bg-blue-50 px-0">
+      <section id="testimonials" className="px-4 py-16 bg-blue-50 px-0">
         <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-center text-blue-700 leading-snug px-4">
           What Our Users Say
         </h2>
@@ -112,6 +113,8 @@ export default function Home() {
           ))}
         </div>
       </section>
+
+      {/* ADD - Frequently Asked Questions */}
 
       {/* Feedback Section */}
       <section id="feedback" className="py-16 px-0">
