@@ -1,12 +1,13 @@
 import { Expense, ExpenseFormData } from '@/config/interfaces';
 import { expenseService } from '@/services/expenseService';
 import { RootState } from '@/store';
+import { hideLoader, showLoader } from '@/store/slices/loaderSlice';
 import { ArrowLeft, Edit, Trash2 } from 'lucide-react';
 import Router from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-hot-toast';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import ExpenseModal from './ExpenseModal';
 
 const Index = () => {
@@ -18,6 +19,7 @@ const Index = () => {
     const [showModal, setShowModal] = useState(false);
     const { reset } = useForm<ExpenseFormData>({ mode: 'onTouched' });
     const user = useSelector((state: RootState) => state.auth.user);
+    const dispatch = useDispatch();
 
     const totalIncome = expenses.filter(expense => expense.amount > 0).reduce((sum, expense) => sum + expense.amount, 0);
     const totalExpanse = expenses.filter(expense => expense.amount < 0).reduce((sum, expense) => sum + expense.amount, 0);
@@ -33,6 +35,9 @@ const Index = () => {
     useEffect(() => {
         const fetchExpenses = async () => {
             if (!user?.id) return;
+
+            dispatch(showLoader());
+
             const { from, to } = getDateRange(selectedRange);
             try {
                 const res = await expenseService.getAllExpenses(user.id, from, to);
@@ -43,11 +48,15 @@ const Index = () => {
                 }
             } catch (error) {
                 console.error('Error fetching expenses:', error);
+                toast.error("Failed to fetch expenses");
+            } finally {
+                dispatch(hideLoader());
             }
         };
 
         fetchExpenses();
     }, [user?.id, selectedRange]);
+
 
 
     const handleEditExpense = (i: number) => {
@@ -65,6 +74,7 @@ const Index = () => {
 
     const updateExitingExpense = async (data: ExpenseFormData) => {
         if (editingIndex !== null && expenses[editingIndex]?._id) {
+            dispatch(showLoader());
             try {
                 const updated = { ...expenses[editingIndex], ...data };
                 const res = await expenseService.updateExpense(updated._id!, updated);
@@ -79,6 +89,8 @@ const Index = () => {
                 }
             } catch {
                 toast.error('Failed to update expense');
+            } finally {
+                dispatch(hideLoader());
             }
         } else {
             toast.error('Expense ID is missing or invalid');
@@ -91,7 +103,10 @@ const Index = () => {
             toast.error('Expense ID not found.');
             return;
         }
+
         if (window.confirm('Are you sure you want to delete this expense?')) {
+            dispatch(showLoader());
+
             try {
                 const res = await expenseService.deleteExpense(expenseToDelete._id);
                 if (res?.status === 200 && res?.success) {
@@ -102,14 +117,19 @@ const Index = () => {
                 }
             } catch {
                 toast.error('Something went wrong.');
+            } finally {
+                dispatch(hideLoader());
             }
         }
     };
 
     const addNewExpense = async (data: ExpenseFormData) => {
+        dispatch(showLoader());
+
         try {
             const payload: any = { ...data, id: user?.id };
             const res: any = await expenseService.addNewExpense(payload);
+
             if (res?.status === 200 && res?.success) {
                 const data: Expense = res?.data;
                 setExpenses((prev) => [...prev, data]);
@@ -120,7 +140,9 @@ const Index = () => {
                 toast.error(res?.message);
             }
         } catch (error: any) {
-            toast.error(error?.response?.data?.message);
+            toast.error(error?.response?.data?.message || 'Something went wrong!');
+        } finally {
+            dispatch(hideLoader());
         }
     };
 

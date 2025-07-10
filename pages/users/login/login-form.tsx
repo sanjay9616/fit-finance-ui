@@ -4,6 +4,7 @@ import { FormField } from '@/config/interfaces';
 import { userService } from '@/services/userService';
 import { AppDispatch } from '@/store';
 import { loginSuccess, logout } from '@/store/slices/authSlice';
+import { hideLoader, showLoader } from '@/store/slices/loaderSlice';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
@@ -46,14 +47,20 @@ const LoginForm = ({ onLoginSuccess }: LoginFormProps) => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        const validationErrors = validate();
-        if (Object.keys(validationErrors).length) {
-            setErrors(validationErrors);
-        } else {
-            console.log("Form submitted:", formData);
-            await loginUser();
+        dispatch(showLoader());
+        try {
+            const validationErrors = validate();
+            if (Object.keys(validationErrors).length) {
+                setErrors(validationErrors);
+            } else {
+                console.log("Form submitted:", formData);
+                await loginUser();
+            }
+        } finally {
+            dispatch(hideLoader());
         }
     };
+
 
     const loginUser = async () => {
         setErrors({});

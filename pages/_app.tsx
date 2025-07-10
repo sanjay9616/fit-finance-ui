@@ -6,6 +6,7 @@ import { store } from "@/store";
 import Layout from "@/components/Layout";
 import { useState } from "react";
 import AppInitializer from "./AppInitializer";
+import Loader from "@/components/Loader";
 
 export default function App({ Component, pageProps }: AppProps) {
   const [isAppReady, setIsAppReady] = useState(false);
@@ -16,9 +17,7 @@ export default function App({ Component, pageProps }: AppProps) {
       <AppInitializer onReady={() => setIsAppReady(true)} />
 
       {!isAppReady ? (
-        <div className="h-screen w-full flex items-center justify-center">
-          <p className="text-gray-600 text-lg">Checking authentication...</p>
-        </div>
+        <Loader message="Checking authentication..." />
       ) : (
         <Layout>
           <Component {...pageProps} />

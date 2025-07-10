@@ -2,14 +2,18 @@ import Input from '@/components/Input';
 import { signupFields } from '@/config/constant'; // Make sure this exists
 import { FormField } from '@/config/interfaces';
 import { userService } from '@/services/userService';
+import { AppDispatch } from '@/store';
+import { hideLoader, showLoader } from '@/store/slices/loaderSlice';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
+import { useDispatch } from 'react-redux';
 
 const SignupForm = () => {
     const [formData, setFormData] = useState<{ [key: string]: string }>({});
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
     const router = useRouter();
+    const dispatch = useDispatch<AppDispatch>();
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -38,18 +42,24 @@ const SignupForm = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        dispatch(showLoader());
         const validationErrors = validate();
+
         if (Object.keys(validationErrors).length) {
             setErrors(validationErrors);
-        } else {
-            try {
-                const data: any = await userService.createUser(formData);
-                toast.success(data?.message || 'User created successfully!');
-                setFormData({});
-                router.push('/users/login');
-            } catch (error: any) {
-                toast.error(error?.response?.data?.message || 'Signup failed');
-            }
+            dispatch(hideLoader()); // hide if validation fails
+            return;
+        }
+
+        try {
+            const data: any = await userService.createUser(formData);
+            toast.success(data?.message || 'User created successfully!');
+            setFormData({});
+            router.push('/users/login');
+        } catch (error: any) {
+            toast.error(error?.response?.data?.message || 'Signup failed');
+        } finally {
+            dispatch(hideLoader());
         }
     };
 

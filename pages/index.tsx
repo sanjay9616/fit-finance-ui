@@ -1,4 +1,4 @@
-import Router from 'next/router';
+import Router, { useRouter } from 'next/router';
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/store';
@@ -11,9 +11,9 @@ import { Features } from '@/config/interfaces';
 
 export default function Home() {
 
-  const user = useSelector((state: RootState) => state.auth.user);
   const [showLogin, setShowLogin] = useState(false);
-  console.log("user", user)
+  const user = useSelector((state: RootState) => state.auth.user);
+  const router = useRouter();
 
   const handleFeatureClick = (path?: string) => {
     if (!user?.id) {
@@ -40,9 +40,15 @@ export default function Home() {
         <p className="mt-3 text-base md:text-lg max-w-xl mx-auto">
           Track expenses, split bills, manage your diet, and achieve fitness goals — all in one app.
         </p>
-        <button className="mt-6 md:mt-8 bg-white text-blue-600 px-6 md:px-8 py-2.5 md:py-3 rounded-lg text-base md:text-lg hover:bg-gray-200 transition">
-          Get Started for Free
-        </button>
+        {!user?.id && (
+          <button
+            onClick={() => router.push('/users/create')}
+            className="mt-6 md:mt-8 bg-white text-blue-600 px-6 md:px-8 py-2.5 md:py-3 rounded-lg text-base md:text-lg hover:bg-gray-200 transition"
+          >
+            Get Started for Free
+          </button>
+        )}
+
       </section>
 
       {/* Features Section */}
