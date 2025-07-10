@@ -16,7 +16,7 @@ const AppInitializer = ({ onReady }: Props) => {
     useEffect(() => {
         const checkAuth = async () => {
             const token = localStorage.getItem('token');
-            const publicPages = ['/', '/users/create'];
+            const publicPages = ['/', '/users/create', '/users/verify'];
             const isProtectedPage = !publicPages.includes(router.pathname);
 
             const handleLogout = (message?: string) => {
