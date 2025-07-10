@@ -1,48 +1,166 @@
 import { useState } from 'react';
-import { Menu, X } from 'lucide-react';
+import { ChevronRight, Menu, User, X } from 'lucide-react';
 import { useRouter } from 'next/router';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '@/store';
+import { features } from '@/config/constant';
+import toast from 'react-hot-toast';
+import { logout } from '@/store/slices/authSlice';
+import Image from 'next/image';
 
 const Header = () => {
-    const [isOpen, setIsOpen] = useState(false);
+    const user = useSelector((state: RootState) => state.auth.user);
+    const dispatch = useDispatch<AppDispatch>();
     const router = useRouter();
+    const [menuOpen, setMenuOpen] = useState(false);
+    const navLinks = ['Features', 'Pricing', 'Contact'];
 
-    const handleSignUp = () => {
-        router.push('/users/create');
-    };
+    const handleRedirection = (path: string | null | undefined) => {
+        setMenuOpen(false);
+        if (user?.id && path) {
+            router.push(path);
+        } else if (!user?.id) {
+            toast.error('Please login to continue.');
+            router.push('/users/login')
+        }
+    }
+
+    const handleLogout = () => {
+        localStorage.removeItem('token');
+        dispatch(logout());
+        setMenuOpen(false);
+        router.push('/users/login');
+    }
 
     return (
-        <header className="bg-gradient-to-r from-blue-500 to-blue-700 text-white p-4 relative shadow-lg">
-            <div className="container mx-auto flex justify-between items-center">
-                <h1
-                    className="text-3xl md:text-4xl font-extrabold tracking-wide cursor-pointer hover:scale-105 transition-transform"
-                    onClick={() => router.push('/')}
-                >
-                    Fit <span className="bg-clip-text text-transparent bg-gradient-to-r from-yellow-300 to-pink-500">Finance</span>
-                </h1>
-                {/* Desktop Navigation */}
-                <nav className="hidden md:flex md:items-center md:space-x-8">
-                    {['Financial Reports', 'Pricing', 'Contact'].map((item) => (
-                        <a key={item} href={`#${item.toLowerCase().replace(/ /g, '-')}`} className="py-2 transition-transform duration-300 hover:scale-105 hover:text-yellow-300">{item}</a>
+        <header className="bg-gradient-to-r from-indigo-600 to-blue-500 shadow-lg sticky top-0 z-50">
+            {/* Desktop View */}
+            <div className="flex items-center justify-between px-4 py-3 md:px-8">
+                <div onClick={() => router.push('/')} className="flex items-center cursor-pointer">
+                    <Image
+                        src="/logo.png"
+                        alt="Logo"
+                        width={120}
+                        height={40}
+                        className="object-contain"
+                        priority
+                    />
+                </div>
+                <nav className="hidden md:flex items-center space-x-6">
+                    {navLinks.map((link) => (
+                        <a
+                            key={link}
+                            href={`#${link.toLowerCase()}`}
+                            className="text-white hover:text-yellow-300 transition font-medium"
+                        >
+                            {link}
+                        </a>
                     ))}
-                    <button onClick={handleSignUp} className="bg-yellow-400 text-blue-900 font-semibold px-6 py-3 rounded-lg shadow-md hover:bg-yellow-500 transition-transform transform hover:scale-105">Sign Up</button>
+
+                    {user?.id ? (
+                        <div className="flex items-center space-x-4">
+                            <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-white font-medium">
+                                <User size={18} />
+                                <span>{user.name}</span>
+                            </div>
+                            <button onClick={handleLogout} className="bg-red-500 text-white font-semibold px-5 py-2 rounded-full hover:bg-red-600 transition">
+                                Logout
+                            </button>
+                        </div>
+                    ) : (
+                        <div className="flex items-center space-x-4">
+                            <button onClick={() => router.push('/users/login')} className="bg-white text-blue-600 font-semibold px-5 py-2 rounded-full hover:bg-gray-100 transition">
+                                Sign In
+                            </button>
+                            <button onClick={() => router.push('/users/create')} className="bg-yellow-300 text-blue-900 font-semibold px-5 py-2 rounded-full hover:bg-yellow-400 transition">
+                                Sign Up
+                            </button>
+                        </div>
+                    )}
                 </nav>
 
-                {/* Mobile Menu Button */}
+                {/* Mobile Menu Icon */}
                 <button
-                    onClick={() => setIsOpen(!isOpen)}
-                    className="md:hidden block focus:outline-none focus:ring-2 focus:ring-yellow-400 rounded-full p-2 cursor-pointer z-30" aria-label={isOpen ? 'Close Menu' : 'Open Menu'}
+                    onClick={() => setMenuOpen(!menuOpen)}
+                    className="md:hidden text-white"
+                    aria-label={menuOpen ? 'Close menu' : 'Open menu'}
                 >
-                    {isOpen ? <X size={32} /> : <Menu size={32} />}
+                    {menuOpen ? <X size={28} /> : <Menu size={28} />}
                 </button>
             </div>
 
-            {/* Mobile Navigation */}
-            <nav className={`md:hidden absolute left-0 w-full bg-blue-600 text-center p-6 z-20 transition-all duration-500 ease-in-out ${isOpen ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0'}`}>
-                {['Financial Reports', 'Pricing', 'Contact'].map((item) => (
-                    <a key={item} href={`#${item.toLowerCase().replace(/ /g, '-')}`} className="block py-3 text-lg font-semibold transition-colors duration-300 hover:text-yellow-300">{item}</a>
-                ))}
-                <button className="bg-yellow-400 text-blue-900 font-semibold px-6 py-3 rounded-lg mt-6 shadow-md hover:bg-yellow-500 transition-transform transform hover:scale-105">Sign Up</button>
-            </nav>
+
+            {/* Mobile View */}
+            <div className="md:hidden">
+                <div className={`fixed top-0 left-0 h-full w-full max-w-xs bg-white z-50 shadow-xl transform transition-transform duration-300 ease-in-out ${menuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+                    <div className="flex items-center justify-between px-4 py-4 border-b">
+                        <div className="flex items-center gap-2">
+                            <div className="w-10 h-10 bg-blue-100 flex items-center justify-center rounded-full">
+                                <User className="text-blue-600" size={20} />
+                            </div>
+                            {user?.id ? (
+                                <span className="text-blue-600 font-semibold text-base">{user.name}</span>
+                            ) : (
+                                <button
+                                    onClick={() => {
+                                        setMenuOpen(false);
+                                        router.push('/users/login');
+                                    }}
+                                    className="text-blue-600 font-medium hover:underline"
+                                >
+                                    Sign In
+                                </button>
+                            )}
+                        </div>
+
+                        <button
+                            onClick={() => setMenuOpen(false)}
+                            className="w-9 h-9 flex items-center justify-center rounded-full bg-white border border-blue-200 text-blue-600 hover:bg-blue-100 transition"
+                            aria-label="Close menu"
+                        >
+                            <X size={20} />
+                        </button>
+                    </div>
+
+                    <div className="flex flex-col gap-3 px-6 py-6 text-base font-medium">
+                        {features.map((item) => (
+                            <button
+                                key={item.title}
+                                onClick={() => handleRedirection(item.path)}
+                                className="flex justify-between items-center w-full text-left text-blue-700 hover:text-indigo-600 transition py-2"
+                            >
+                                <span>{item.title}</span>
+                                <ChevronRight size={18} className="text-blue-500" />
+                            </button>
+                        ))}
+
+                        {user?.id ? (
+                            <button
+                                onClick={handleLogout}
+                                className="mt-4 bg-blue-600 text-white py-2 rounded-full hover:bg-blue-700 transition"
+                            >
+                                Logout
+                            </button>
+                        ) : (
+                            <button
+                                onClick={() => {
+                                    setMenuOpen(false)
+                                    router.push('/users/create')
+                                }}
+                                className="mt-4 bg-blue-600 text-white py-2 rounded-full hover:bg-blue-700 transition"
+                            >
+                                Sign Up
+                            </button>
+                        )}
+                    </div>
+                </div>
+            </div>
+
+
+            {/* Overlay when mobile menu is open */}
+            {menuOpen && (
+                <div className="fixed inset-0 bg-black opacity-40 z-40" onClick={() => setMenuOpen(false)} />
+            )}
         </header>
     );
 };
