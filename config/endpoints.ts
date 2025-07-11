@@ -6,6 +6,7 @@ export const ENDPOINTS = {
         VALIDATE_TOKEN: '/users/validate-token'
     },
     EXPENSE: {
-        EXPENCES: '/expense'
+        EXPENCES: '/expense',
+        GET_CATEGORY_LIST: '/expense/categories'
     }
 }

@@ -1,7 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { ExpenseFormData } from '@/config/interfaces';
 import Error from '@/components/Error';
+import toast from 'react-hot-toast';
+import { debounce } from '@/config/utils';
+import { expenseService } from '@/services/expenseService';
+import { RootState } from '@/store';
+import { useSelector } from 'react-redux';
 
 interface Props {
     show: boolean;
@@ -20,8 +25,14 @@ const ExpenseModal = ({ show, onClose, onSubmit, defaultValues }: Props) => {
         formState: { errors },
     } = useForm<ExpenseFormData>({ defaultValues });
 
+    if (!show) return null;
+
     const [tag, setTag] = useState<'income' | 'expense'>('expense');
     const amount = watch('amount');
+    const [categorySearchStr, setCategorySearchStr] = useState('');
+    const [suggestions, setSuggestions] = useState<string[]>([]);
+    const [loading, setLoading] = useState(false);
+    const user = useSelector((state: RootState) => state.auth.user);
 
     useEffect(() => {
         if (amount !== undefined && !isNaN(amount)) {
@@ -37,7 +48,33 @@ const ExpenseModal = ({ show, onClose, onSubmit, defaultValues }: Props) => {
         }
     }, [defaultValues, reset]);
 
-    if (!show) return null;
+    const fetchCategories = async (str: string) => {
+        if (!user?.id) return;
+        try {
+            setLoading(true);
+            setValue('category', str);
+            const res = await expenseService.getCategories(user.id, str);
+            if (res?.status === 200 && res?.success) {
+                setSuggestions(res.data);
+            } else {
+                toast.error(res.message);
+            }
+        } catch (error: any) {
+            toast.error(error?.response?.data?.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const fetchCategoriesDebounce = useMemo(() => debounce((str: string) => fetchCategories(str)), []);
+
+    useEffect(() => {
+        if (categorySearchStr.trim()) {
+            fetchCategoriesDebounce(categorySearchStr);
+        } else {
+            setSuggestions([]);
+        }
+    }, [categorySearchStr, fetchCategoriesDebounce]);
 
     const handleTagSelect = (selected: 'income' | 'expense') => {
         setTag(selected);
@@ -45,6 +82,12 @@ const ExpenseModal = ({ show, onClose, onSubmit, defaultValues }: Props) => {
             const newAmount = selected === 'income' ? Math.abs(amount) : -Math.abs(amount);
             setValue('amount', newAmount);
         }
+    };
+
+    const handleSelect = (name: string) => {
+        setCategorySearchStr('');
+        setValue('category', name);
+        setSuggestions([]);
     };
 
     const handleFormSubmit = (data: ExpenseFormData) => {
@@ -68,12 +111,33 @@ const ExpenseModal = ({ show, onClose, onSubmit, defaultValues }: Props) => {
                 <h2 className="text-lg font-bold mb-4">{defaultValues ? 'Edit Expense' : 'Add Expense'}</h2>
 
                 <form onSubmit={handleSubmit(handleFormSubmit)} className="">
-                    <div>
+
+                    <div className="relative">
                         <label className="block text-sm font-medium mb-1">Category</label>
                         <input
                             {...register('category', { required: 'Category is required' })}
+                            onChange={(e) => {
+                                console.log("e.target.value", e.target.value);
+                                setCategorySearchStr(e.target.value);
+                            }}
+                            onBlur={() => setSuggestions([])}
+                            placeholder="Start typing to search or add..."
+                            autoComplete="off"
                             className="w-full border px-3 py-2 rounded"
                         />
+                        {suggestions?.length > 0 && (
+                            <ul className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-xl shadow-lg max-h-52 overflow-auto backdrop-blur-sm">
+                                {suggestions.map((item: string, i: number) => (
+                                    <li
+                                        key={i}
+                                        className="p-3 text-sm text-gray-800 hover:bg-blue-100 hover:text-blue-600 transition-all duration-150 ease-in-out cursor-pointer"
+                                        onMouseDown={() => handleSelect(item)}
+                                    >
+                                        {item}
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
                         <Error message={errors?.category?.message} />
                     </div>
 
@@ -85,8 +149,8 @@ const ExpenseModal = ({ show, onClose, onSubmit, defaultValues }: Props) => {
                                     type="button"
                                     onClick={() => handleTagSelect('income')}
                                     className={`px-2 py-0.5 rounded-full text-xs font-medium border transition ${tag === 'income'
-                                            ? 'bg-green-100 text-green-700 border-green-400'
-                                            : 'bg-gray-100 text-gray-500 border-gray-300 hover:bg-green-50 hover:text-green-600'
+                                        ? 'bg-green-100 text-green-700 border-green-400'
+                                        : 'bg-gray-100 text-gray-500 border-gray-300 hover:bg-green-50 hover:text-green-600'
                                         }`}
                                 >
                                     Income
@@ -96,8 +160,8 @@ const ExpenseModal = ({ show, onClose, onSubmit, defaultValues }: Props) => {
                                     type="button"
                                     onClick={() => handleTagSelect('expense')}
                                     className={`px-2 py-0.5 rounded-full text-xs font-medium border transition ${tag === 'expense'
-                                            ? 'bg-red-100 text-red-700 border-red-400'
-                                            : 'bg-gray-100 text-gray-500 border-gray-300 hover:bg-red-50 hover:text-red-600'
+                                        ? 'bg-red-100 text-red-700 border-red-400'
+                                        : 'bg-gray-100 text-gray-500 border-gray-300 hover:bg-red-50 hover:text-red-600'
                                         }`}
                                 >
                                     Expense

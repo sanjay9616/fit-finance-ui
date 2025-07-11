@@ -8,4 +8,7 @@ export const expenseService = {
     addNewExpense: (expence: any) => apiService.post(`${ENDPOINTS.EXPENSE.EXPENCES}`, expence),
     updateExpense: (id: string, expence: any) => apiService.patch(`${ENDPOINTS.EXPENSE.EXPENCES}/${id}`, expence),
     deleteExpense: (id: string) => apiService.delete(`${ENDPOINTS.EXPENSE.EXPENCES}/${id}`),
+    getCategories: (id: number, search: string) => apiService.get(`${ENDPOINTS.EXPENSE.GET_CATEGORY_LIST}/${id}`, {
+        params: { search }
+    }),
 };
