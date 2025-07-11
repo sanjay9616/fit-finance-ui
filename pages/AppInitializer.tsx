@@ -42,7 +42,7 @@ const AppInitializer = ({ onReady }: Props) => {
                     return;
                 }
             } catch {
-                handleLogout('Something went wrong. Please login again.');
+                handleLogout('ERROR: Something went wrong. Please login again.');
                 return;
             }
 
