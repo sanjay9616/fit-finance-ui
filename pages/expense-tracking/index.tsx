@@ -55,7 +55,7 @@ const Index = () => {
         };
 
         fetchExpenses();
-    }, [user?.id, selectedRange]);
+    }, [user?.id, selectedRange, dispatch]);
 
 
 

@@ -1,12 +1,13 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { ExpenseFormData } from '@/config/interfaces';
 import Error from '@/components/Error';
 import toast from 'react-hot-toast';
 import { debounce } from '@/config/utils';
 import { expenseService } from '@/services/expenseService';
-import { RootState } from '@/store';
-import { useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '@/store';
+import { useDispatch, useSelector } from 'react-redux';
+import { hideLoader, showLoader } from '@/store/slices/loaderSlice';
 
 interface Props {
     show: boolean;
@@ -25,13 +26,11 @@ const ExpenseModal = ({ show, onClose, onSubmit, defaultValues }: Props) => {
         formState: { errors },
     } = useForm<ExpenseFormData>({ defaultValues });
 
-    if (!show) return null;
-
     const [tag, setTag] = useState<'income' | 'expense'>('expense');
     const amount = watch('amount');
     const [categorySearchStr, setCategorySearchStr] = useState('');
     const [suggestions, setSuggestions] = useState<string[]>([]);
-    const [loading, setLoading] = useState(false);
+    const dispatch = useDispatch<AppDispatch>();
     const user = useSelector((state: RootState) => state.auth.user);
 
     useEffect(() => {
@@ -48,25 +47,31 @@ const ExpenseModal = ({ show, onClose, onSubmit, defaultValues }: Props) => {
         }
     }, [defaultValues, reset]);
 
-    const fetchCategories = async (str: string) => {
-        if (!user?.id) return;
-        try {
-            setLoading(true);
-            setValue('category', str);
-            const res = await expenseService.getCategories(user.id, str);
-            if (res?.status === 200 && res?.success) {
-                setSuggestions(res.data);
-            } else {
-                toast.error(res.message);
+    const fetchCategories = useCallback(
+        async (str: string) => {
+            if (!user?.id) return;
+            try {
+                dispatch(showLoader());
+                setValue('category', str); // from react-hook-form
+                const res = await expenseService.getCategories(user.id, str);
+                if (res?.status === 200 && res?.success) {
+                    setSuggestions(res.data);
+                } else {
+                    toast.error(res.message);
+                }
+            } catch (error: any) {
+                toast.error(error?.response?.data?.message || 'Error fetching categories');
+            } finally {
+                dispatch(hideLoader());
             }
-        } catch (error: any) {
-            toast.error(error?.response?.data?.message);
-        } finally {
-            setLoading(false);
-        }
-    };
+        },
+        [user?.id, setValue, dispatch]
+    );
 
-    const fetchCategoriesDebounce = useMemo(() => debounce((str: string) => fetchCategories(str)), []);
+    const fetchCategoriesDebounce = useMemo(
+        () => debounce((str: string) => fetchCategories(str), 300),
+        [fetchCategories]
+    );
 
     useEffect(() => {
         if (categorySearchStr.trim()) {
@@ -97,6 +102,8 @@ const ExpenseModal = ({ show, onClose, onSubmit, defaultValues }: Props) => {
         };
         onSubmit(finalData);
     };
+
+    if (!show) return null;
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm bg-black/30">

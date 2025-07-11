@@ -6,7 +6,6 @@ import Modal from '@/components/Modal';
 import LoginForm from './users/login/login-form';
 import toast from 'react-hot-toast';
 import { features, userStatement } from '../config/constant';
-import { ChevronRight } from 'lucide-react';
 import { Features } from '@/config/interfaces';
 
 export default function Home() {
