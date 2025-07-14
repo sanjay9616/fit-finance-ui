@@ -8,6 +8,7 @@ import { expenseService } from '@/services/expenseService';
 import { AppDispatch, RootState } from '@/store';
 import { useDispatch, useSelector } from 'react-redux';
 import { hideLoader, showLoader } from '@/store/slices/loaderSlice';
+import { MESSAGE } from '@/config/mesage';
 
 interface Props {
     show: boolean;
@@ -60,7 +61,7 @@ const ExpenseModal = ({ show, onClose, onSubmit, defaultValues }: Props) => {
                     toast.error(res.message);
                 }
             } catch (error: any) {
-                toast.error(error?.response?.data?.message || 'Error fetching categories');
+                toast.error(error?.response?.data?.message || MESSAGE.ERROR.SERVER_ERROR);
             } finally {
                 dispatch(hideLoader());
             }

@@ -1,4 +1,5 @@
 import { Expense, ExpenseFormData } from '@/config/interfaces';
+import { MESSAGE } from '@/config/mesage';
 import { expenseService } from '@/services/expenseService';
 import { RootState } from '@/store';
 import { hideLoader, showLoader } from '@/store/slices/loaderSlice';
@@ -46,9 +47,9 @@ const Index = () => {
                 } else {
                     toast.error(res.message);
                 }
-            } catch (error) {
+            } catch (error: any) {
                 console.error('Error fetching expenses:', error);
-                toast.error("Failed to fetch expenses");
+                toast.error(error?.response?.data?.message || MESSAGE.ERROR.SERVER_ERROR);
             } finally {
                 dispatch(hideLoader());
             }
@@ -87,8 +88,8 @@ const Index = () => {
                 } else {
                     toast.error(res?.message);
                 }
-            } catch {
-                toast.error('Failed to update expense');
+            } catch (error: any) {
+                toast.error(error?.response?.data?.message || MESSAGE.ERROR.SERVER_ERROR);
             } finally {
                 dispatch(hideLoader());
             }
@@ -115,8 +116,8 @@ const Index = () => {
                 } else {
                     toast.error(res?.message);
                 }
-            } catch {
-                toast.error('Something went wrong.');
+            } catch (error: any) {
+                toast.error(error?.response?.data?.message || MESSAGE.ERROR.SERVER_ERROR);
             } finally {
                 dispatch(hideLoader());
             }

@@ -1,6 +1,7 @@
 import Input from '@/components/Input';
 import { loginFields } from '@/config/constant';
 import { FormField } from '@/config/interfaces';
+import { MESSAGE } from '@/config/mesage';
 import { userService } from '@/services/userService';
 import { AppDispatch } from '@/store';
 import { hideLoader, showLoader } from '@/store/slices/loaderSlice';
@@ -60,7 +61,7 @@ const Index = () => {
             const data: any = await userService.verifyUser(formData, token);
             toast.success(data?.message);
         } catch (error: any) {
-            toast.error(error?.response?.data?.message || "Something went wrong.");
+            toast.error(error?.response?.data?.message || MESSAGE.ERROR.SERVER_ERROR);
         } finally {
             dispatch(hideLoader());
         }

@@ -1,6 +1,7 @@
 import Input from '@/components/Input';
 import { loginFields } from '@/config/constant';
 import { FormField } from '@/config/interfaces';
+import { MESSAGE } from '@/config/mesage';
 import { userService } from '@/services/userService';
 import { AppDispatch } from '@/store';
 import { loginSuccess, logout } from '@/store/slices/authSlice';
@@ -76,7 +77,7 @@ const LoginForm = ({ onLoginSuccess }: LoginFormProps) => {
                 await validateUser(token);
             }
         } catch (error: any) {
-            toast.error(error?.response?.data?.message || "Login failed");
+            toast.error(error?.response?.data?.message || MESSAGE.ERROR.SERVER_ERROR);
         }
     }
 
@@ -96,7 +97,8 @@ const LoginForm = ({ onLoginSuccess }: LoginFormProps) => {
                 dispatch(logout());
                 router.push('/users/login');
             }
-        } catch {
+        } catch (error: any) {
+            toast.error(error?.response?.data?.message || MESSAGE.ERROR.SERVER_ERROR);
             localStorage.removeItem('token');
             dispatch(logout());
             router.push('/users/login');
