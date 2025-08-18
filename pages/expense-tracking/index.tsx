@@ -170,7 +170,7 @@ const Index = () => {
 
             if (res?.status === 200 && res?.success) {
                 const data: Expense = res?.data;
-                setExpenses((prev) => [...prev, data]);
+                setExpenses((prev) => [data, ...prev]);
                 toast.success(res?.message);
                 reset();
                 setShowModal(false);

@@ -119,6 +119,7 @@ export default function SetRate() {
                                             <div className="flex items-center justify-between bg-gray-100 p-1 rounded-md">
                                                 <input
                                                     type="number"
+                                                    step="0.01"
                                                     value={item.quantity}
                                                     onChange={(e) => {
                                                         const newQuantity = e.target.value === "" ? NaN : Number(e.target.value);

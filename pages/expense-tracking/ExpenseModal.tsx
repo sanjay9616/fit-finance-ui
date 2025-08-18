@@ -142,6 +142,7 @@ const ExpenseModal = ({ show, onClose, onSubmit, defaultValues }: Props) => {
                             <div className="flex-1">
                                 <input
                                     type="number"
+                                    step="0.01"
                                     {...register('amount', { required: 'Amount is required' })}
                                     className="w-full border px-3 py-2 rounded"
                                     placeholder="Enter amount"

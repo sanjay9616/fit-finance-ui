@@ -100,6 +100,7 @@ const ExpenseGoalModal = ({ show, onClose, onSubmit, defaultValues }: Props) => 
             <div className="flex-1">
               <input
                 type="number"
+                step="0.01"
                 {...register('targetAmount', { required: 'Target amount is required' })}
                 className="w-full border px-3 py-2 rounded"
                 placeholder="Enter target amount"
