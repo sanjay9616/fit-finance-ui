@@ -1,9 +1,8 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { ExpenseFormData } from '@/config/interfaces';
+import { ExpenseFormData, ExpenseType } from '@/config/interfaces';
 import Error from '@/components/Error';
 import toast from 'react-hot-toast';
-import { debounce } from '@/config/utils';
 import { expenseService } from '@/services/expenseService';
 import { AppDispatch, RootState } from '@/store';
 import { useDispatch, useSelector } from 'react-redux';
@@ -18,88 +17,63 @@ interface Props {
 }
 
 const ExpenseModal = ({ show, onClose, onSubmit, defaultValues }: Props) => {
-    const {
-        register,
-        handleSubmit,
-        reset,
-        setValue,
-        watch,
-        formState: { errors },
-    } = useForm<ExpenseFormData>({ defaultValues });
 
-    const [tag, setTag] = useState<'income' | 'expense'>('expense');
-    const amount = watch('amount');
-    const [categorySearchStr, setCategorySearchStr] = useState('');
-    const [suggestions, setSuggestions] = useState<string[]>([]);
+    const { register, handleSubmit, setValue, formState: { errors } } = useForm<ExpenseFormData>({ defaultValues });
+    const [expenseType, setExpenseType] = useState<ExpenseType>('Expense');
+    const [categoryList, setCategoryList] = useState<string[]>([]);
     const dispatch = useDispatch<AppDispatch>();
     const user = useSelector((state: RootState) => state.auth.user);
 
     useEffect(() => {
-        if (amount !== undefined && !isNaN(amount)) {
-            if (amount < 0 && tag !== 'expense') setTag('expense');
-            if (amount > 0 && tag !== 'income') setTag('income');
+        if (defaultValues?.expenseType) {
+            setExpenseType(defaultValues.expenseType);
         }
-    }, [amount, tag]);
+    }, [defaultValues]);
 
-    useEffect(() => {
-        reset(defaultValues);
-        if (defaultValues?.amount !== undefined) {
-            setTag(defaultValues.amount < 0 ? 'expense' : 'income');
-        }
-    }, [defaultValues, reset]);
-
-    const fetchCategories = useCallback(
-        async (str: string) => {
-            if (!user?.id) return;
-            try {
-                dispatch(showLoader());
-                setValue('category', str); // from react-hook-form
-                const res = await expenseService.getCategories(user.id, str);
-                if (res?.status === 200 && res?.success) {
-                    setSuggestions(res.data);
-                } else {
-                    toast.error(res.message);
-                }
-            } catch (error: any) {
-                toast.error(error?.response?.data?.message || MESSAGE.ERROR.SERVER_ERROR);
-            } finally {
-                dispatch(hideLoader());
+    const getCategoryList = useCallback(async (str: string, userId: number) => {
+        try {
+            dispatch(showLoader());
+            const res = await expenseService.getCategories(userId, str, defaultValues?.createdAt ?? new Date().getTime());
+            if (res?.status === 200 && res?.success) {
+                setCategoryList(res.data);
+            } else {
+                toast.error(res.message);
             }
-        },
-        [user?.id, setValue, dispatch]
-    );
-
-    const fetchCategoriesDebounce = useMemo(
-        () => debounce((str: string) => fetchCategories(str), 300),
-        [fetchCategories]
-    );
+        } catch (error: any) {
+            toast.error(error?.response?.data?.message || MESSAGE.ERROR.SERVER_ERROR);
+        } finally {
+            dispatch(hideLoader());
+        }
+    }, [dispatch, defaultValues?.createdAt]);
 
     useEffect(() => {
-        if (categorySearchStr.trim()) {
-            fetchCategoriesDebounce(categorySearchStr);
-        } else {
-            setSuggestions([]);
-        }
-    }, [categorySearchStr, fetchCategoriesDebounce]);
+        if (user?.id) getCategoryList('', user.id);
+    }, [getCategoryList, user?.id]);
 
-    const handleTagSelect = (selected: 'income' | 'expense') => {
-        setTag(selected);
-        if (!isNaN(amount)) {
-            const newAmount = selected === 'income' ? Math.abs(amount) : -Math.abs(amount);
-            setValue('amount', newAmount);
+    const handleCategorySelect = async (category: string) => {
+        try {
+            if (!user?.id) return;
+            dispatch(showLoader());
+            const res = await expenseService.getExpenseGoalsByCategory(user?.id, category, defaultValues?.createdAt ?? (new Date()).getTime());
+            if (res?.status === 200 && res?.success) {
+                // setCategoryList(res.data);
+                setValue('description', res?.data?.description);
+                setExpenseType(res?.data?.expenseType);
+            } else {
+                toast.error(res.message);
+            }
+        } catch (error: any) {
+            toast.error(error?.response?.data?.message || MESSAGE.ERROR.SERVER_ERROR);
+        } finally {
+            dispatch(hideLoader());
         }
-    };
-
-    const handleSelect = (name: string) => {
-        setCategorySearchStr('');
-        setValue('category', name);
-        setSuggestions([]);
-    };
+    }
 
     const handleFormSubmit = (data: ExpenseFormData) => {
         const finalData = {
             ...data,
-            amount: tag === 'income' ? Math.abs(data.amount) : -Math.abs(data.amount),
+            expenseType,
+            amount: Number(data.amount),
         };
         onSubmit(finalData);
     };
@@ -121,32 +95,13 @@ const ExpenseModal = ({ show, onClose, onSubmit, defaultValues }: Props) => {
                 <form onSubmit={handleSubmit(handleFormSubmit)} className="">
 
                     <div className="relative">
-                        <label className="block text-sm font-medium mb-1">Category</label>
                         <input
-                            {...register('category', { required: 'Category is required' })}
-                            onChange={(e) => {
-                                console.log("e.target.value", e.target.value);
-                                setCategorySearchStr(e.target.value);
-                            }}
-                            onBlur={() => setSuggestions([])}
-                            placeholder="Start typing to search or add..."
-                            autoComplete="off"
+                            type="text"
+                            {...register('name', { required: 'Name is required' })}
                             className="w-full border px-3 py-2 rounded"
+                            placeholder="Enter Name"
                         />
-                        {suggestions?.length > 0 && (
-                            <ul className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-xl shadow-lg max-h-52 overflow-auto backdrop-blur-sm">
-                                {suggestions.map((item: string, i: number) => (
-                                    <li
-                                        key={i}
-                                        className="p-3 text-sm text-gray-800 hover:bg-blue-100 hover:text-blue-600 transition-all duration-150 ease-in-out cursor-pointer"
-                                        onMouseDown={() => handleSelect(item)}
-                                    >
-                                        {item}
-                                    </li>
-                                ))}
-                            </ul>
-                        )}
-                        <Error message={errors?.category?.message} />
+                        <Error message={errors?.name?.message} />
                     </div>
 
                     <div>
@@ -155,35 +110,67 @@ const ExpenseModal = ({ show, onClose, onSubmit, defaultValues }: Props) => {
                             <div className="flex gap-2">
                                 <button
                                     type="button"
-                                    onClick={() => handleTagSelect('income')}
-                                    className={`px-2 py-0.5 rounded-full text-xs font-medium border transition ${tag === 'income'
-                                        ? 'bg-green-100 text-green-700 border-green-400'
-                                        : 'bg-gray-100 text-gray-500 border-gray-300 hover:bg-green-50 hover:text-green-600'
-                                        }`}
-                                >
-                                    Income
-                                </button>
-
-                                <button
-                                    type="button"
-                                    onClick={() => handleTagSelect('expense')}
-                                    className={`px-2 py-0.5 rounded-full text-xs font-medium border transition ${tag === 'expense'
+                                    className={`px-2 py-0.5 rounded-full text-xs font-medium border transition ${expenseType === 'Expense'
                                         ? 'bg-red-100 text-red-700 border-red-400'
                                         : 'bg-gray-100 text-gray-500 border-gray-300 hover:bg-red-50 hover:text-red-600'
                                         }`}
                                 >
                                     Expense
                                 </button>
-
+                                <button
+                                    type="button"
+                                    className={`px-2 py-0.5 rounded-full text-xs font-medium border transition ${expenseType === 'Income'
+                                        ? 'bg-green-100 text-green-700 border-green-400'
+                                        : 'bg-gray-100 text-gray-500 border-gray-300 hover:bg-green-50 hover:text-green-600'
+                                        }`}
+                                >
+                                    Income
+                                </button>
+                                <button
+                                    type="button"
+                                    className={`px-2 py-0.5 rounded-full text-xs font-medium border transition ${expenseType === 'Saving'
+                                        ? 'bg-blue-100 text-blue-700 border-blue-400'
+                                        : 'bg-gray-100 text-gray-500 border-gray-300 hover:bg-blue-50 hover:text-blue-600'
+                                        }`}
+                                >
+                                    Saving
+                                </button>
                             </div>
                         </div>
 
-                        <input
-                            type="number"
-                            {...register('amount', { required: 'Amount is required' })}
-                            className="w-full border px-3 py-2 rounded"
-                        />
-                        <Error message={errors?.amount?.message} />
+                        <div className="flex gap-4">
+                            <div className="flex-1">
+                                <input
+                                    type="number"
+                                    {...register('amount', { required: 'Amount is required' })}
+                                    className="w-full border px-3 py-2 rounded"
+                                    placeholder="Enter amount"
+                                />
+                                <Error message={errors?.amount?.message} />
+                            </div>
+
+                            <div className="flex-1">
+                                <select
+                                    {...register('category', { required: 'Category is required' })}
+                                    className="w-full border px-3 py-2 rounded bg-white"
+                                    defaultValue=""
+                                    onChange={(e) => handleCategorySelect(e.target.value)}
+                                >
+                                    <option value="" disabled>
+                                        Select Category...
+                                    </option>
+                                    {categoryList?.map((item: string, i: number) => (
+                                        <option key={i} value={item}>
+                                            {item}
+                                        </option>
+                                    ))}
+                                </select>
+
+                                <Error message={errors?.category?.message} />
+                            </div>
+
+                        </div>
+
                     </div>
 
                     <div>

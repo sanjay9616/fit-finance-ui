@@ -54,7 +54,6 @@ const LoginForm = ({ onLoginSuccess }: LoginFormProps) => {
             if (Object.keys(validationErrors).length) {
                 setErrors(validationErrors);
             } else {
-                console.log("Form submitted:", formData);
                 await loginUser();
             }
         } finally {

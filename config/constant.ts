@@ -2,7 +2,7 @@ import { Features, FormField } from "./interfaces";
 
 export const features: Features[] = [
     { title: "Track Your Daily Expenses", desc: "Easily categorize and monitor your expenses in real time.", path: "/expense-tracking" },
-    { title: "Set Monthly Expense Goals", desc: "Set goals, track progress, and achieve with Fit Finance.", path: '' },
+    { title: "Set Monthly Expense Goals", desc: "Set goals, track progress, and achieve with Fit Finance.", path: '/expense-goals' },
     { title: "Split/Settle Your Expenses", desc: "Easily divide expenses among friends or family members.", path: '' },
     { title: "Budget & Savings Report", desc: "Generate detailed reports to analyze your spending and savings.", path: '' },
     { title: "Set Your Daily Macros & Meals", desc: "Track your daily nutrition intake, manage meals, and stay fit.", path: "/diet-management" },
@@ -73,3 +73,19 @@ export const signupFields: FormField[] = [
     }
 ];
 
+export const getProgressColor = (percentage: number): string => {
+    if (percentage > 100) return '#059669';  // emerald-600
+    if (percentage > 90) return '#16a34a';   // green-600
+    if (percentage > 80) return '#22c55e';   // green-500
+    if (percentage > 70) return '#84cc16';   // lime-500
+    if (percentage > 60) return '#facc15';   // yellow-400
+    if (percentage > 50) return '#eab308';   // yellow-500
+    if (percentage > 40) return '#f59e0b';   // amber-500
+    if (percentage > 30) return '#f97316';   // orange-500
+    if (percentage > 20) return '#ea580c';   // orange-600
+    if (percentage > 10) return '#f87171';   // red-400
+    return '#ef4444';                        // red-500
+};
+
+export const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+export const YEARS = Array.from({ length: 5 }, (_, i) => new Date().getFullYear() - 4 + i);
