@@ -33,12 +33,14 @@ const Index = () => {
     const user = useSelector((state: RootState) => state.auth.user);
     const dispatch = useDispatch();
 
+    const [avgExpenses, setAvgExpenses] = useState(0);
+
     const totalIncome = expenses.filter((expense) => expense.expenseType === 'Income').reduce((sum, expense) => sum + expense.amount, 0);
     const totalExpense = expenses.filter((expense) => expense.expenseType === 'Expense').reduce((sum, expense) => sum + expense.amount, 0);
     const totalSaving = expenses.filter((expense) => expense.expenseType === 'Saving').reduce((sum, expense) => sum + expense.amount, 0);
     const totalBalance = totalIncome - totalExpense - totalSaving;
-    const spendTransactions = expenses.filter((expense) => expense.expenseType === 'Expense');
-    const averageSpendAmount = spendTransactions.length ? Math.abs(totalExpense / spendTransactions.length) : 0;
+    // const spendTransactions = expenses.filter((expense) => expense.expenseType === 'Expense');
+    // const averageSpendAmount = spendTransactions.length ? Math.abs(totalExpense / spendTransactions.length) : 0;
 
 
     const headerCards = [
@@ -64,8 +66,8 @@ const Index = () => {
             bg: 'from-blue-50 to-white',
         },
         {
-            title: 'Average Spend',
-            value: `₹${averageSpendAmount.toFixed(0)}`,
+            title: 'Average Daily Spend',
+            value: `₹${avgExpenses.toFixed(0)}`,
             icon: '🪙',
             textColor: 'text-orange-500',
             bg: 'from-yellow-50 to-white',
@@ -96,6 +98,13 @@ const Index = () => {
     useEffect(() => {
         fetchExpenses();
     }, [fetchExpenses]);
+
+    useEffect(() => {
+        const { from, to } = getDateRange(selectedRange);
+        const daysInRange = Math.max(1, Math.ceil((to - from) / (1000 * 60 * 60 * 24)));
+        const averageSpendAmount = totalExpense > 0 ? Math.abs(totalExpense / daysInRange) : 0;
+        setAvgExpenses(averageSpendAmount);
+      }, [expenses, selectedRange, totalExpense]);
 
     const handleEditExpense = (i: number) => {
         setEditingIndex(i);
