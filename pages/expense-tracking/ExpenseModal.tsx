@@ -30,6 +30,12 @@ const ExpenseModal = ({ show, onClose, onSubmit, defaultValues }: Props) => {
         }
     }, [defaultValues]);
 
+    useEffect(() => {
+        if (defaultValues?.category && categoryList.length > 0) {
+            setValue('category', defaultValues.category);
+        }
+    }, [defaultValues?.category, categoryList, setValue]);
+
     const getCategoryList = useCallback(async (str: string, userId: number) => {
         try {
             dispatch(showLoader());
