@@ -13,22 +13,13 @@ import ExpenseModal from './ExpenseModal';
 
 const Index = () => {
     const range: string[] = ["Today", "This Week", "Last Week", "This Month", "Last Month", "This Year", "Last Year", "All Time"];
-    const [expenses, setExpenses] = useState<Expense[]>([
-        {
-            "_id": "68710ed68a81fb0b3fc52fc7",
-            "category": "Rent",
-            "name": "Chicken",
-            "expenseType": 'Income',
-            "amount": 12,
-            "description": "mdm",
-            "createdAt": 1752239830434,
-            "updatedAt": 1752239830434,
-        },
-    ]);
+    const [expenses, setExpenses] = useState<Expense[]>([]);
     const [editingIndex, setEditingIndex] = useState<number | null>(null);
     const [editedExpense, setEditedExpense] = useState<Expense | null>(null);
     const [selectedRange, setSelectedRange] = useState('This Month');
     const [showModal, setShowModal] = useState(false);
+    const [selectedCategory, setSelectedCategory] = useState("");
+    const [categories, setCategories] = useState<string[]>([]);
     const { reset } = useForm<ExpenseFormData>({ mode: 'onTouched' });
     const user = useSelector((state: RootState) => state.auth.user);
     const dispatch = useDispatch();
@@ -39,9 +30,6 @@ const Index = () => {
     const totalExpense = expenses.filter((expense) => expense.expenseType === 'Expense').reduce((sum, expense) => sum + expense.amount, 0);
     const totalSaving = expenses.filter((expense) => expense.expenseType === 'Saving').reduce((sum, expense) => sum + expense.amount, 0);
     const totalBalance = totalIncome - totalExpense - totalSaving;
-    // const spendTransactions = expenses.filter((expense) => expense.expenseType === 'Expense');
-    // const averageSpendAmount = spendTransactions.length ? Math.abs(totalExpense / spendTransactions.length) : 0;
-
 
     const headerCards = [
         {
@@ -80,8 +68,12 @@ const Index = () => {
         dispatch(showLoader());
 
         const { from, to } = getDateRange(selectedRange);
+        const payload: any = { from, to };
+        if (selectedCategory) {
+            payload.category = selectedCategory; // 👈 add category filter
+        }
         try {
-            const res = await expenseService.getAllExpenses(user.id, from, to);
+            const res = await expenseService.getAllExpenses(user.id, payload);
             if (res?.status === 200 && res?.success) {
                 setExpenses(res.data);
             } else {
@@ -93,7 +85,7 @@ const Index = () => {
         } finally {
             dispatch(hideLoader());
         }
-    }, [user?.id, selectedRange, dispatch]);
+    }, [user?.id, selectedRange, selectedCategory, dispatch]);
 
     useEffect(() => {
         fetchExpenses();
@@ -104,7 +96,27 @@ const Index = () => {
         const daysInRange = Math.max(1, Math.ceil((to - from) / (1000 * 60 * 60 * 24)));
         const averageSpendAmount = totalExpense > 0 ? Math.abs(totalExpense / daysInRange) : 0;
         setAvgExpenses(averageSpendAmount);
-      }, [expenses, selectedRange, totalExpense]);
+    }, [expenses, selectedRange, totalExpense]);
+
+    useEffect(() => {
+        const fetchCategories = async () => {
+            if (!user?.id) return;
+
+            try {
+                const res = await expenseService.getAllCategories(user.id);
+                if (res?.status === 200 && res?.success) {
+                    setCategories(res.data || []);
+                } else {
+                    toast.error(res.message || "Failed to fetch categories");
+                }
+            } catch (error: any) {
+                toast.error(error?.response?.data?.message || "Something went wrong!");
+            }
+        };
+
+        fetchCategories();
+    }, [user?.id]);
+
 
     const handleEditExpense = (i: number) => {
         setEditingIndex(i);
@@ -268,6 +280,7 @@ const Index = () => {
                                 </p>
                             </div>
                             <div className="flex flex-row flex-wrap justify-between sm:justify-end items-center gap-2 w-full md:w-auto">
+                                {/* Range filter */}
                                 <select
                                     className="flex-1 min-w-[120px] max-w-[180px] border border-gray-300 px-2 py-2 rounded-md text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
                                     value={selectedRange}
@@ -278,13 +291,30 @@ const Index = () => {
                                     ))}
                                 </select>
 
+                                {/* Category filter */}
+                                <select
+                                    className="flex-1 min-w-[140px] max-w-[180px] border border-gray-300 px-2 py-2 rounded-md text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                    value={selectedCategory}
+                                    onChange={(e) => setSelectedCategory(e.target.value)}
+                                >
+                                    <option value="">All Categories</option>
+                                    {categories.map((cat: string) => (
+                                        <option key={cat} value={cat}>
+                                            {cat}
+                                        </option>
+                                    ))}
+                                </select>
+
+                                {/* Add Entry button */}
                                 <button
-                                    className="flex-1 min-w-[120px] max-w-[180px] px-3 py-2 bg-blue-600 text-white text-sm rounded-md shadow hover:bg-blue-700 transition"
+                                    className="w-full sm:flex-1 sm:min-w-[120px] sm:max-w-[180px] px-3 py-2 bg-blue-600 text-white text-sm rounded-md shadow hover:bg-blue-700 transition"
                                     onClick={() => setShowModal(true)}
                                 >
                                     + Add Entry
                                 </button>
+
                             </div>
+
                         </div>
                     </div>
 

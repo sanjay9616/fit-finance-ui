@@ -8,6 +8,7 @@ export const ENDPOINTS = {
     EXPENSE: {// /expense-goals/:userId
         EXPENCES: '/expense',
         GET_CATEGORY_LIST: '/expense/categories',
+        GET_ALL_CATEGORY_LIST: '/expense/categories/all',
         GET_EXPENSE_GOAL_BY_CATEGORY: '/expense/expense-goals',
     },
     EXPENSE_GOAL: {
