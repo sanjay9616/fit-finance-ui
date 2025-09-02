@@ -41,7 +41,8 @@ const ExpenseModal = ({ show, onClose, onSubmit, defaultValues }: Props) => {
             dispatch(showLoader());
             const res = await expenseService.getCategories(userId, str, defaultValues?.createdAt ?? new Date().getTime());
             if (res?.status === 200 && res?.success) {
-                setCategoryList(res.data);
+                const sorted = (res.data || []).sort((a: string, b: string) => a.localeCompare(b));
+                setCategoryList(sorted);
             } else {
                 toast.error(res.message);
             }
@@ -62,7 +63,6 @@ const ExpenseModal = ({ show, onClose, onSubmit, defaultValues }: Props) => {
             dispatch(showLoader());
             const res = await expenseService.getExpenseGoalsByCategory(user?.id, category, defaultValues?.createdAt ?? (new Date()).getTime());
             if (res?.status === 200 && res?.success) {
-                // setCategoryList(res.data);
                 setValue('description', res?.data?.description);
                 setExpenseType(res?.data?.expenseType);
             } else {

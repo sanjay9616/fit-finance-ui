@@ -105,7 +105,8 @@ const Index = () => {
             try {
                 const res = await expenseService.getAllCategories(user.id);
                 if (res?.status === 200 && res?.success) {
-                    setCategories(res.data || []);
+                    const sorted = (res.data || []).sort((a: string, b: string) => a.localeCompare(b));                    console.log("sorted", sorted);
+                    setCategories(sorted);
                 } else {
                     toast.error(res.message || "Failed to fetch categories");
                 }
